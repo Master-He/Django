@@ -8,4 +8,6 @@ from django.shortcuts import render
 
 def index(request):
     """访问首页的视图"""
+
+
     return HttpResponse("<h2>hello django</h2>")
