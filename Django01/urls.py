@@ -16,10 +16,11 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-from users import views
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 
-    url(r'^users/', views.index)
+
+    # 自己的  # 注意这是有双引号的
+    url(r'^', include('users.urls'))
 ]
