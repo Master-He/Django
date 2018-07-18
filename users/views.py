@@ -1,16 +1,22 @@
 import json
 
 from django.http import HttpResponse
+from django.http.response import JsonResponse, HttpResponseRedirect
 
-from django.shortcuts import render
-
+from django.shortcuts import render, redirect
 
 # Create your views here.
+from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.views import View
+
+from users.decorators import check_ip
 
 
 def index(request):
     """访问首页的视图"""
     # return HttpResponse("<h2>hello django</h2>")
+    print("index")
     return render(request, 'users/index.html')
 
 
@@ -81,3 +87,125 @@ def news7(request):
     # 管理员怎么登录???
 
     return HttpResponse("success")
+
+
+def resp(request):
+    """普通响应"""
+    response = HttpResponse(content="响应体", content_type="text/plain", status=201, )
+    response["a"] = 1
+    response["b"] = 2
+    return response
+
+
+def resp2(request):
+    """json响应"""
+    data = [{"name": "中文"}, {"speed": "90"}]
+    return JsonResponse(data, safe=False, json_dumps_params={'ensure_ascii': False})
+
+
+def resp3(request):
+    """重定向响应"""
+    # return HttpResponseRedirect('/index')
+    return redirect('/index')
+
+
+def resp4(request):
+    """reverse函数: 动态生成URL地址，解决url硬编码维护麻烦的问题"""
+    my_url = reverse("users:index")
+    print(my_url)
+    return redirect(my_url)
+
+
+def set_cookie(request):
+    response = HttpResponse("设置cookie")
+    response.set_cookie('a', '2', max_age=10)
+    return response
+
+
+def get_cookie(request):
+    a = request.COOKIES.get('a')
+    print(type(a))
+    return HttpResponse(a)
+
+
+def set_session(request):
+    """生成session"""
+    request.session['user_id'] = "he"
+    request.session['user_name'] = "haha"
+    return HttpResponse("设置session")
+
+
+def get_session(request):
+    """获取session"""
+    a = request.session.get('user_id', "不存在")
+
+    b = request.session.get('user_name', "不存在")
+    c = request.session.get("no", "默认值")  # c得到的是默认值
+    text = "user_id = %s , user_name = %s, c = %s" % (a, b, c)
+    return HttpResponse(text)
+
+
+def del_session(request):
+    data = "删除成功"
+    # try:
+    #     del request.session['user_id']
+    # except Exception as e:
+    #     print("删除错误, 错误类型:", e)
+    #     data = "删除错误, 错误类型" + str(e)
+
+    request.session.clear()
+    # request.session.flush()
+
+    return HttpResponse(data)
+
+
+@check_ip
+def post(request):
+    # 显示发帖界面
+    return render(request, 'users/post.html')
+
+
+def do_post(request):
+    """执行发帖操作"""
+    title = request.POST.get('title')
+    content = request.POST.get('content')
+
+    text = "title = %s , content = %s " % (title, content)
+    return HttpResponse(text)
+
+
+
+class CheckIpMixin(object):
+    """扩展类:检测ip是否为黑名单"""
+    # @method_decorator(check_ip)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+
+# 方式三
+# @method_decorator(check_ip,name='post')  # 为特定的请求方法添加
+# @method_decorator(check_ip,name='get')  # 为特定的请求方法添加
+# @method_decorator(check_ip,name='dispatch')  # 为所有的请求方法添加
+class PostView(CheckIpMixin,View):
+    # 方式二
+    # 给所有的http方法都添加装饰其
+    # 重写父类方法快捷键 ctrl + o
+    # @method_decorator(check_ip)
+    # def dispatch(self, request, *args, **kwargs):
+    #     return super().dispatch(request, *args, **kwargs)
+
+
+    # @method_decorator(check_ip)  # 方式一
+    def get(self, request):
+        return render(request, 'users/post2.html')
+
+    def post(self, request):
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+
+        text = "title = %s , content = %s " % (title, content)
+        return HttpResponse(text)
+
+
+
+
