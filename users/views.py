@@ -6,6 +6,7 @@ from django.http.response import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 
 # Create your views here.
+from django.template import loader
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -17,7 +18,31 @@ def index(request):
     """访问首页的视图"""
     # return HttpResponse("<h2>hello django</h2>")
     print("index")
-    return render(request, 'users/index.html')
+
+    context = {
+        'name': 'django',
+        'my_list': [1, 2, 3, 4],
+        'my_dict': {
+            'name': 'python',
+            'age': 20,
+            'gender': '男',
+        }
+    }
+    # 方式一
+    # render参数一:请求对象
+    # render参数二:模块路径
+    # render参数三:字典数据
+
+
+    return render(request, 'users/index.html', context)
+
+    # 方式二
+    # # 获取模板对象
+    # template = loader.get_template('users/index.html')  # type: Template
+    # # 渲染得到字符串
+    # html_str = template.render(context)
+    # # 响应请求
+    # return HttpResponse(html_str)
 
 
 # 未命名参数(位置参数): 按定义的顺序传递
@@ -174,9 +199,9 @@ def do_post(request):
     return HttpResponse(text)
 
 
-
 class CheckIpMixin(object):
     """扩展类:检测ip是否为黑名单"""
+
     # @method_decorator(check_ip)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -186,7 +211,7 @@ class CheckIpMixin(object):
 # @method_decorator(check_ip,name='post')  # 为特定的请求方法添加
 # @method_decorator(check_ip,name='get')  # 为特定的请求方法添加
 # @method_decorator(check_ip,name='dispatch')  # 为所有的请求方法添加
-class PostView(CheckIpMixin,View):
+class PostView(CheckIpMixin, View):
     # 方式二
     # 给所有的http方法都添加装饰其
     # 重写父类方法快捷键 ctrl + o
@@ -205,7 +230,3 @@ class PostView(CheckIpMixin,View):
 
         text = "title = %s , content = %s " % (title, content)
         return HttpResponse(text)
-
-
-
-
