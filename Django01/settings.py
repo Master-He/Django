@@ -53,8 +53,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 
     # 自定义的中间件, 拷贝引用
-    'users.middlewares.MyMiddleware',
-    'users.middlewares.MyMiddleware2'
+    # 'users.middlewares.MyMiddleware',
+    # 'users.middlewares.MyMiddleware2'
 )
 
 ROOT_URLCONF = 'Django01.urls'
@@ -81,10 +81,22 @@ WSGI_APPLICATION = 'Django01.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        # 配置使用mysql
+        'ENGINE': 'django.db.backends.mysql',  # 数据库产品
+        'HOST': "localhost",  # 数据库ip
+        'PORT': 3306,  # 数据库端口
+        'USER': "root",  # 用户名
+        'PASSWORD': "mysql",  # 密码
+        'NAME': "db_django01",  # 数据库名
     }
 }
 
@@ -126,3 +138,6 @@ CACHES = {
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
+
+# 配置上传的文件保存在哪个目录
+MEDIA_ROOT=os.path.join(BASE_DIR,"media")

@@ -7,5 +7,22 @@
 <body>
     使用静态文件:<br/>
     <img src="/static/imgs/avatar01.png"/>
+
+    <!-- 显示模板变量 -->
+    <h1>{{ name }}</h1>
+    <h1>{{ my_list.0 }}</h1>
+    <h1>{{ my_dict }}</h1>
+    <h1>{{ my_dict.name }}</h1>
+    <h1>{{ my_list | length }}</h1>
+    {% for item in my_list %}
+        {#    这是当前循环次数, 从1开始    #}
+        {{ forloop.counter }}
+        {#    这是当前循环次数, 从1开始    #}
+        {{ forloop.counter0 }}
+        <br/>
+    {% empty %}
+        列表为空或者不存在时执行此逻辑
+    {% endfor %}
+
 </body>
 </html>
